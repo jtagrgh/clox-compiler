@@ -2,29 +2,17 @@
 
 #include "common.h"
 #include "debug.h"
+#include "stack.h"
 #include "vm.h"
 
 VM vm;
 
-static void resetStack() {
-	vm.stackTop = vm.stack;
-}
-
 void initVM() {
-	resetStack();
+	initStack(&vm.stack);
 }
 
 void freeVM() {
-}
-
-void push(Value value) {
-	*vm.stackTop = value;
-	vm.stackTop++;
-}
-
-Value pop() {
-	vm.stackTop--;
-	return *vm.stackTop;
+	freeStack(&vm.stack);
 }
 
 static InterpretResult run() {
@@ -34,9 +22,9 @@ static InterpretResult run() {
 		READ_BYTE() + (READ_BYTE()<<8) + (READ_BYTE()<<16)])
 #define BINARY_OP(op) \
 	do { \
-		double b = pop(); \
-		double a = pop(); \
-		push(a op b); \
+		double b = popStack(&vm.stack); \
+		double a = popStack(&vm.stack); \
+		pushStack(&vm.stack, a op b); \
 	} while (false)
 
 	for (;;) {
@@ -48,13 +36,13 @@ static InterpretResult run() {
 			case OP_CONSTANT: 
 				{ 
 					Value constant = READ_CONSTANT();
-					push(constant);
+					pushStack(&vm.stack, constant);
 					break;
 				}
 			case OP_CONSTANT_LONG:
 				{
 					Value constant = READ_CONSTANT_LONG();
-					push(constant);
+					pushStack(&vm.stack, constant);
 					break;
 				}
 			case OP_ADD:
@@ -79,19 +67,19 @@ static InterpretResult run() {
 				}
 			case OP_NEGATE:
 				{
-					push(-pop());
+					pushStack(&vm.stack, -popStack(&vm.stack));
 					break;
 				}
 			case OP_RETURN: 
 				{ 
-					printValue(pop());
+					printValue(popStack(&vm.stack));
 					printf("\n");
 					return INTERPRET_OK; 
 				}
 		}
 #ifdef DEBUG_TRACE_EXECUTION
 		printf("	");
-		for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
+		for (Value* slot = vm.stack.values; slot < stackTop(&vm.stack); slot++) {
 			printf("[ ");
 			printValue(*slot);
 			printf(" ]");
