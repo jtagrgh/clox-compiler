@@ -21,7 +21,7 @@ void initScanner(const char* source) {
 static bool isAlpha(char c) {
 	return (c >= 'a' && c <= 'z') ||
 		   (c >= 'A' && c <= 'Z') ||
-		   (c == '_')
+		   (c == '_');
 }
 
 static bool isDigit(char c) {
@@ -53,7 +53,7 @@ static bool match(char expected) {
 	return true;
 }
 
-static Token makeToken(TokenType token) {
+static Token makeToken(TokenType type) {
 	Token token;
 	token.type = type;
 	token.start = scanner.start;
@@ -96,7 +96,7 @@ static void skipWhitespace() {
 	}
 }
 
-static TokenType checkKeyword(int start, int length
+static TokenType checkKeyword(int start, int length,
 	const char* rest, TokenType type) {
 
 	if (scanner.current - scanner.start == start + length &&
@@ -164,7 +164,7 @@ static Token string() {
 		advance();
 	}
 
-	if (isAtEnd()) return erroToken("Unterminated string.");
+	if (isAtEnd()) return errorToken("Unterminated string.");
 
 	advance();
 	return makeToken(TOKEN_STRING);
@@ -174,14 +174,14 @@ Token scanToken() {
 	skipWhitespace();
 	scanner.start = scanner.current;
 
-	if (isatEnd()) return makeToken(TOKEN_EOF);
+	if (isAtEnd()) return makeToken(TOKEN_EOF);
 
 	char c = advance();
 	if (isAlpha(c)) return identifier();
 	if (isDigit(c)) return number();
 
 	switch (c) {
-		case '(': return makeToken(TOKEN_LEFT_PARENT);
+		case '(': return makeToken(TOKEN_LEFT_PAREN);
 		case ')': return makeToken(TOKEN_RIGHT_PAREN);
 		case '{': return makeToken(TOKEN_LEFT_BRACE);
 		case '}': return makeToken(TOKEN_RIGHT_BRACE);
