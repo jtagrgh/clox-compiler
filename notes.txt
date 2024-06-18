@@ -1,0 +1,79 @@
+(-1 + 2) * 3 - -4 
+
+expression()
+	parsePrecedence(PREC_ASSIGNMENT)
+		prefixRule = grouping
+		grouping()
+			expression()
+				parsePrecedence(PREC_ASSIGNMENT)
+					prefixRule = unary
+					unary()
+						parsePrecedence(PREC_UNARY)
+							prefixRule = number
+							number()
+								emitConstant(value);
+						emitByte(OP_NEGATE)
+					infixRule = binary
+					binary()
+						parsePrecedence(term + 1)
+							prefixRule = number
+							number()
+								emitConstant(value);
+						emitByte(OP_ADD)
+			consume(TOKEN_RIGHT_PAREN)
+		infixRule = binary
+		binary()
+			parsePrecedence(factor + 1)
+				prefixRule = number
+				number()
+					emitConstant(value)
+			emitByte(OP_MULTIPLY)
+		inixRule = binary
+		binary()
+			parsePrecedence(term + 1)
+				prefixRule = unary
+				unary()
+					parsePrecedence(PREC_UNARY)
+						prefixRule = number
+						number()
+							emitConstant(value)
+					emitByte(OP_NEGATE)
+			emitByte(OP_SUBTRACT)
+
+
+1 + 2
+expression()
+	parsePrecedence(PREC_ASSIGNMENT)
+		prefix = number
+		number()
+			emitConstant
+		infixRule = binary
+		binary()
+			parsePrecedence(term + 1)
+				prefixRule = number
+				number()
+					emitConstant
+			emitByte(OP_ADD)
+
+
+1 * 2 + 3
+expression()
+	parsePrecedence(PREC_ASSIGNMENT)
+		prefix = number
+		number()
+			emitConstant
+		infixRule = binary
+		binary()
+			parsePrecedence(factor + 1)
+				prefixRule = number
+				number()
+					emitConstant
+			emitByte(OP_MULTIPLY)
+		infixRule = binary
+			parsePrecedence(term + 1)
+				prefixRule = number
+				number()
+					emitConstant
+			emitByte(OP_ADD)
+		
+

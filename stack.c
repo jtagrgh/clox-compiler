@@ -27,6 +27,10 @@ Value popStack(Stack* stack) {
 	return stack->values[stack->count];
 }
 
+Value peekStack(Stack* stack, int depth) {
+	return stack->values[stack->count - 1 - depth];
+}
+
 void freeStack(Stack* stack) {
     FREE_ARRAY(Value, stack->values, stack->capacity);
     initStack(stack);

@@ -12,6 +12,7 @@ typedef struct {
 void initStack(Stack* stack);
 void pushStack(Stack* stack, Value value);
 Value popStack(Stack* stack);
+Value peekStack(Stack* stack, int depth);
 void freeStack(Stack* stack);
 Value* stackTop(Stack* stack);
 
